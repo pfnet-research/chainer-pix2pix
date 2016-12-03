@@ -14,7 +14,7 @@ https://phillipi.github.io/pix2pix/
 4. 数時間待つ
 
 # facade以外のデータセットでやるとき
-- データセットは位置の合った画像(あるいは画像的な構造を持つarray)のペア
-- `facade_dataset.py`を書き換える。get_exampleが呼ばれた時に、(入力画像, 教師出力画像)が返るようになっていれば良い(両方numpy array)。
+- データセットを用意する。位置の合った画像(あるいは画像的な構造を持つarray)のペアが必要。数百枚程度でもそれっぽい結果が出せると言われている
+- `facade_dataset.py`を書き換える。get_exampleが呼ばれた時に、i番目の(入力画像, 教師出力画像)が返るようになっていれば良い(両方numpy array)。
 - `facade_visualizer.py`の可視化コードをデータセットに合わせて書き換える。
 - `train_facade.py`は50行目くらいのin_ch, out_chをデータセットに合わせて書き換える。
