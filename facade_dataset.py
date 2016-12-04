@@ -15,7 +15,6 @@ import numpy as np
 import skimage.io as io
 
 from chainer.dataset import dataset_mixin
-import cv2
 
 # download `BASE` dataset from http://cmp.felk.cvut.cz/~tylecr1/facade/
 class FacadeDataset(dataset_mixin.DatasetMixin):
