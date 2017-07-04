@@ -70,11 +70,11 @@ class FacadeUpdater(chainer.training.StandardUpdater):
             t_out[i,:] = xp.asarray(batch[i][1])
         x_in = Variable(x_in)
         
-        z = enc(x_in, test=False)
-        x_out = dec(z, test=False)
+        z = enc(x_in)
+        x_out = dec(z)
 
-        y_fake = dis(x_in, x_out, test=False)
-        y_real = dis(x_in, t_out, test=False)
+        y_fake = dis(x_in, x_out)
+        y_real = dis(x_in, t_out)
 
 
         enc_optimizer.update(self.loss_enc, enc, x_out, t_out, y_fake)
