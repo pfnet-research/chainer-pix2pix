@@ -27,10 +27,10 @@ class CBR(chainer.Chain):
             layers['batchnorm'] = L.BatchNormalization(ch1)
         super(CBR, self).__init__(**layers)
         
-    def __call__(self, x, test):
+    def __call__(self, x):
         h = self.c(x)
         if self.bn:
-            h = self.batchnorm(h, test=test)
+            h = self.batchnorm(h)
         if self.dropout:
             h = F.dropout(h)
         if not self.activation is None:
@@ -41,7 +41,7 @@ class Encoder(chainer.Chain):
     def __init__(self, in_ch):
         layers = {}
         w = chainer.initializers.Normal(0.02)
-        layers['c0'] = F.Convolution2D(in_ch, 64, 3, 1, 1, initialW=w)
+        layers['c0'] = L.Convolution2D(in_ch, 64, 3, 1, 1, initialW=w)
         layers['c1'] = CBR(64, 128, bn=True, sample='down', activation=F.leaky_relu, dropout=False)
         layers['c2'] = CBR(128, 256, bn=True, sample='down', activation=F.leaky_relu, dropout=False)
         layers['c3'] = CBR(256, 512, bn=True, sample='down', activation=F.leaky_relu, dropout=False)
@@ -51,10 +51,10 @@ class Encoder(chainer.Chain):
         layers['c7'] = CBR(512, 512, bn=True, sample='down', activation=F.leaky_relu, dropout=False)
         super(Encoder, self).__init__(**layers)
 
-    def __call__(self, x, test=False):
+    def __call__(self, x):
         hs = [F.leaky_relu(self.c0(x))]
         for i in range(1,8):
-            hs.append(self['c%d'%i](hs[i-1], test=test))
+            hs.append(self['c%d'%i](hs[i-1]))
         return hs
 
 class Decoder(chainer.Chain):
@@ -68,15 +68,15 @@ class Decoder(chainer.Chain):
         layers['c4'] = CBR(1024, 256, bn=True, sample='up', activation=F.relu, dropout=False)
         layers['c5'] = CBR(512, 128, bn=True, sample='up', activation=F.relu, dropout=False)
         layers['c6'] = CBR(256, 64, bn=True, sample='up', activation=F.relu, dropout=False)
-        layers['c7'] = F.Convolution2D(128, out_ch, 3, 1, 1, initialW=w)
+        layers['c7'] = L.Convolution2D(128, out_ch, 3, 1, 1, initialW=w)
         super(Decoder, self).__init__(**layers)
 
-    def __call__(self, hs, test=False):
-        h = self.c0(hs[-1], test=test)
+    def __call__(self, hs):
+        h = self.c0(hs[-1])
         for i in range(1,8):
             h = F.concat([h, hs[-i-1]])
             if i<7:
-                h = self['c%d'%i](h, test=test)
+                h = self['c%d'%i](h)
             else:
                 h = self.c7(h)
         return h
@@ -91,14 +91,14 @@ class Discriminator(chainer.Chain):
         layers['c1'] = CBR(64, 128, bn=True, sample='down', activation=F.leaky_relu, dropout=False)
         layers['c2'] = CBR(128, 256, bn=True, sample='down', activation=F.leaky_relu, dropout=False)
         layers['c3'] = CBR(256, 512, bn=True, sample='down', activation=F.leaky_relu, dropout=False)
-        layers['c4'] = F.Convolution2D(512, 1, 3, 1, 1, initialW=w)
+        layers['c4'] = L.Convolution2D(512, 1, 3, 1, 1, initialW=w)
         super(Discriminator, self).__init__(**layers)
 
-    def __call__(self, x_0, x_1, test=False):
-        h = F.concat([self.c0_0(x_0, test=test), self.c0_1(x_1, test=test)])
-        h = self.c1(h, test=test)
-        h = self.c2(h, test=test)
-        h = self.c3(h, test=test)
+    def __call__(self, x_0, x_1):
+        h = F.concat([self.c0_0(x_0), self.c0_1(x_1)])
+        h = self.c1(h)
+        h = self.c2(h)
+        h = self.c3(h)
         h = self.c4(h)
         #h = F.average_pooling_2d(h, h.data.shape[2], 1, 0)
         return h

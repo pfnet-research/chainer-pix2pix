@@ -37,8 +37,8 @@ def out_image(updater, enc, dec, rows, cols, seed, dst):
                 t_out[i,:] = xp.asarray(batch[i][1])
             x_in = Variable(x_in)
 
-            z = enc(x_in, test=False)
-            x_out = dec(z, test=False)
+            z = enc(x_in)
+            x_out = dec(z)
             
             in_all[it,:] = x_in.data.get()[0,:]
             gt_all[it,:] = t_out.get()[0,:]
