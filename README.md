@@ -18,8 +18,8 @@ From the left side: input, output, ground_truth
  - If the model size is large, you can reduce `--snapshot_interval` to save resources.
 
 # Using other datasets
-- データセットを用意する。位置の合った画像(あるいは画像的な構造を持つarray)のペアが必要。数百枚程度でもそれっぽい結果が出せると言われている。
-- `facade_dataset.py`を書き換える。get_exampleが呼ばれた時に、i番目の(入力画像, 教師出力画像)が返るようになっていれば良い(両方numpy array)。
-- `updater.py`でlossの計算を行っているが(現在はL1 loss + adversarial loss)、変える必要があれば変える。
-- `facade_visualizer.py`の可視化コードをデータセットに合わせて書き換える。
-- `train_facade.py`は50行目くらいのin_ch, out_chをデータセットに合わせて書き換える。
+- Gather image pairs (e.g. label + photo). Several hundred pairs are required for good results.
+- Create a copy of `facade_dataset.py` for your dataset. The function get_example should be written so that it returns the i-th image pair a tuple of numpy arrays i.e. `(input, output)`.
+- It maybe necessary to update the loss function in `updater.py`.
+- Likewise, make a copy of `facade_visualizer.py` and modify to visualize the dataset.
+- In `train_facade.py` change `in_ch` and `out_ch` to the correct input and output channels for your data.
